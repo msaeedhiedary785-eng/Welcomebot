@@ -19,13 +19,9 @@ def keep_alive():
     t = Thread(target=run_web)
     t.start()
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(func=lambda message: 'سلام' in message.text)
 def send_welcome(message):
-    bot.reply_to(message, "سلام! ربات شما با موفقیت روشن شد و آماده به کار است. 🎉")
-
-@bot.message_handler(func=lambda message: True)
-def echo_all(message):
-    bot.reply_to(message, "پیام شما دریافت شد: " + message.text)
+    bot.reply_to(message, "سلام، خوبین؟ 👋\nبه مشهد استار خوش اومدی 🌙\nامیدوارم اینجا حال دلت خوش باشه ❤️")
 
 if __name__ == '__main__':
     keep_alive()
