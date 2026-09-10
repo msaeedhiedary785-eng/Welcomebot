@@ -21,7 +21,7 @@ def keep_alive():
 
 @bot.message_handler(func=lambda message: 'سلام' in message.text)
 def send_welcome(message):
-    bot.reply_to(message, "سلام، خوبین؟ 👋\nبه مشهد استار خوش اومدی 🌙\nامیدوارم اینجا حال دلت خوش باشه ❤️")
+    bot.reply_to(message, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞")
 
 if __name__ == '__main__':
     keep_alive()
