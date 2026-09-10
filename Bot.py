@@ -24,8 +24,8 @@ def keep_alive():
 def send_welcome(message):
     bot.send_message(message.chat.id, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞", reply_to_message_id=message.message_id)
 
-# پاسخ به خداحافظ و بای
-@bot.message_handler(func=lambda message: message.text and ('خداحافظ' in message.text or 'بای' in message.text))
+# پاسخ به خداحافظ، خدافظ و بای
+@bot.message_handler(func=lambda message: message.text and ('خداحافظ' in message.text or 'خدافظ' in message.text or 'بای' in message.text))
 def send_goodbye(message):
     bot.send_message(message.chat.id, "چه زود داری میری 🥺", reply_to_message_id=message.message_id)
 
