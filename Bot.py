@@ -32,18 +32,35 @@ def self_ping():
                 pass
             time.sleep(300)
 
-# ۱. بررسی دقیق کلمه‌ی سلام به صورت مستقل (به سلامتی گیر نمی‌دهد)
-@bot.message_handler(func=lambda message: message.text and any(word.strip('،!؟.,؛»«()[]{}') == 'سلام' for word in message.text.split()))
+# پاکسازی متن
+def clean_text(text):
+    if not text:
+        return ""
+    return text.strip().strip('،!؟.,؛»«()[]{}')
+
+# بررسی اینکه آیا فرستنده ادمین است یا خیر
+def is_admin(message):
+    try:
+        if message.chat.type in ['group', 'supergroup']:
+            member = bot.get_chat_member(message.chat.id, message.from_user.id)
+            if member.status in ['administrator', 'creator']:
+                return True
+        return False
+    except:
+        return False
+
+# ۱. پاسخ به سلام (فقط کاربران عادی و فقط وقتی پیام خودشون هست، نه وقتی ادمین‌ها دارن جواب می‌دن یا ریپلی می‌کنن)
+@bot.message_handler(func=lambda message: message.text and not is_admin(message) and message.reply_to_message is None and clean_text(message.text) == 'سلام')
 def send_welcome(message):
     bot.send_message(message.chat.id, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞", reply_to_message_id=message.message_id)
 
-# ۲. بررسی دقیق کلمات خداحافظ، خدافظ یا بای به صورت مستقل
-@bot.message_handler(func=lambda message: message.text and any(word.strip('،!؟.,؛»«()[]{}') in ['خداحافظ', 'خدافظ', 'بای'] for word in message.text.split()))
+# ۲. پاسخ به خداحافظ (فقط کاربران عادی و پیام مستقل)
+@bot.message_handler(func=lambda message: message.text and not is_admin(message) and message.reply_to_message is None and clean_text(message.text) in ['خداحافظ', 'خدافظ', 'بای'])
 def send_goodbye(message):
     bot.send_message(message.chat.id, "چه زود داری میری 🥺", reply_to_message_id=message.message_id)
 
-# ۳. بررسی دقیق کلمات لف یا لفت به صورت مستقل
-@bot.message_handler(func=lambda message: message.text and any(word.strip('،!؟.,؛»«()[]{}') in ['لف', 'لفت'] for word in message.text.split()))
+# ۳. پاسخ به لفت (فقط کاربران عادی و پیام مستقل)
+@bot.message_handler(func=lambda message: message.text and not is_admin(message) and message.reply_to_message is None and clean_text(message.text) in ['لف', 'لفت'])
 def send_left(message):
     bot.send_message(message.chat.id, "خیلی بدی کجا میری منو تنها میزاری؟ 💔", reply_to_message_id=message.message_id)
 
