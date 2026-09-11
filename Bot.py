@@ -4,7 +4,6 @@ from threading import Thread
 import telebot
 import time
 import requests
-import re
 
 TOKEN = '8628828031:AAFK0mSv7Sp2caHb9dmM02N3ITTqIfqVu5g'
 bot = telebot.TeleBot(TOKEN)
@@ -33,18 +32,18 @@ def self_ping():
                 pass
             time.sleep(300)
 
-# ۱. پاسخ به سلام (فقط وقتی پیام حداکثر ۲ یا ۳ کلمه باشد و با سلام شروع شود)
-@bot.message_handler(func=lambda message: message.text and message.text.strip().startswith('سلام') and len(message.text.split()) <= 3)
+# ۱. بررسی دقیق کلمه‌ی سلام به صورت مستقل (به سلامتی گیر نمی‌دهد)
+@bot.message_handler(func=lambda message: message.text and any(word.strip('،!؟.,؛»«()[]{}') == 'سلام' for word in message.text.split()))
 def send_welcome(message):
     bot.send_message(message.chat.id, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞", reply_to_message_id=message.message_id)
 
-# ۲. پاسخ به خداحافظ، خدافظ یا بای
-@bot.message_handler(func=lambda message: message.text and bool(re.search(r'\b(خداحافظ|خدافظ|بای)\b', message.text)) and len(message.text.split()) <= 3)
+# ۲. بررسی دقیق کلمات خداحافظ، خدافظ یا بای به صورت مستقل
+@bot.message_handler(func=lambda message: message.text and any(word.strip('،!؟.,؛»«()[]{}') in ['خداحافظ', 'خدافظ', 'بای'] for word in message.text.split()))
 def send_goodbye(message):
     bot.send_message(message.chat.id, "چه زود داری میری 🥺", reply_to_message_id=message.message_id)
 
-# ۳. پاسخ به لف یا لفت
-@bot.message_handler(func=lambda message: message.text and message.text.strip() in ['لف', 'لفت'])
+# ۳. بررسی دقیق کلمات لف یا لفت به صورت مستقل
+@bot.message_handler(func=lambda message: message.text and any(word.strip('،!؟.,؛»«()[]{}') in ['لف', 'لفت'] for word in message.text.split()))
 def send_left(message):
     bot.send_message(message.chat.id, "خیلی بدی کجا میری منو تنها میزاری؟ 💔", reply_to_message_id=message.message_id)
 
