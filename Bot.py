@@ -4,6 +4,7 @@ from threading import Thread
 import telebot
 import time
 import requests
+import re
 
 TOKEN = '8628828031:AAFK0mSv7Sp2caHb9dmM02N3ITTqIfqVu5g'
 bot = telebot.TeleBot(TOKEN)
@@ -21,7 +22,6 @@ def keep_alive():
     t = Thread(target=run_web)
     t.start()
 
-# این تابع خودکار هر چند دقیقه به خودش پینگ می‌فرستد تا نخوابد
 def self_ping():
     time.sleep(10)
     app_url = os.environ.get('RENDER_EXTERNAL_URL')
@@ -31,26 +31,25 @@ def self_ping():
                 requests.get(app_url)
             except:
                 pass
-            time.sleep(300) # هر ۵ دقیقه یک بار
+            time.sleep(300)
 
-# پاسخ به سلام
-@bot.message_handler(func=lambda message: message.text and 'سلام' in message.text)
+# ۱. پاسخ به سلام (فقط وقتی پیام با سلام شروع شود)
+@bot.message_handler(func=lambda message: message.text and message.text.strip().startswith('سلام'))
 def send_welcome(message):
     bot.send_message(message.chat.id, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞", reply_to_message_id=message.message_id)
 
-# پاسخ به خداحافظ، خدافظ یا بای
-@bot.message_handler(func=lambda message: message.text and ('خداحافظ' in message.text or 'خدافظ' in message.text or 'بای' in message.text))
+# ۲. پاسخ به خداحافظ، خدافظ یا بای (وقتی در انتهای متن یا به صورت کلمه مستقل بیاید)
+@bot.message_handler(func=lambda message: message.text and bool(re.search(r'\b(خداحافظ|خدافظ|بای)\b', message.text)) and len(message.text.split()) <= 3)
 def send_goodbye(message):
     bot.send_message(message.chat.id, "چه زود داری میری 🥺", reply_to_message_id=message.message_id)
 
-# پاسخ به لف یا لفت
-@bot.message_handler(func=lambda message: message.text and ('لفت' in message.text or 'لف' in message.text))
+# ۳. پاسخ به لف یا لفت (فقط وقتی خودِ پیام دقیقاً لف یا لفت باشد)
+@bot.message_handler(func=lambda message: message.text and message.text.strip() in ['لف', 'لفت'])
 def send_left(message):
     bot.send_message(message.chat.id, "خیلی بدی کجا میری منو تنها میزاری؟ 💔", reply_to_message_id=message.message_id)
 
 if __name__ == '__main__':
     keep_alive()
-    # روشن کردن بخش خود-پینگی
     t_ping = Thread(target=self_ping)
     t_ping.start()
     
