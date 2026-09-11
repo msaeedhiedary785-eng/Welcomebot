@@ -33,17 +33,31 @@ def self_ping():
                 pass
             time.sleep(300)
 
-# ۱. پاسخ به سلام (فقط وقتی پیام با سلام شروع شود)
-@bot.message_handler(func=lambda message: message.text and message.text.strip().startswith('سلام'))
+# تابع تشخیص سلام واقعی (جلوی جملاتی مثل «سلام کرد» را می‌گیرد)
+def check_real_greeting(text):
+    text = text.strip()
+    if text == 'سلام':
+        return True
+    if text.startswith('سلام'):
+        words = text.split()
+        # کلماتی که اگر بعد از سلام بیودند یعنی ربات نباید جواب بدهد
+        bad_words = ['کرد', 'داد', 'گفت', 'رسوند', 'فرستاد', 'اومد', 'کردند', 'دادند', 'کردی']
+        if len(words) > 1 and words[1] in bad_words:
+            return False
+        return True
+    return False
+
+# ۱. پاسخ به سلام واقعی
+@bot.message_handler(func=lambda message: message.text and check_real_greeting(message.text))
 def send_welcome(message):
     bot.send_message(message.chat.id, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞", reply_to_message_id=message.message_id)
 
-# ۲. پاسخ به خداحافظ، خدافظ یا بای (وقتی در انتهای متن یا به صورت کلمه مستقل بیاید)
+# ۲. پاسخ به خداحافظ، خدافظ یا بای
 @bot.message_handler(func=lambda message: message.text and bool(re.search(r'\b(خداحافظ|خدافظ|بای)\b', message.text)) and len(message.text.split()) <= 3)
 def send_goodbye(message):
     bot.send_message(message.chat.id, "چه زود داری میری 🥺", reply_to_message_id=message.message_id)
 
-# ۳. پاسخ به لف یا لفت (فقط وقتی خودِ پیام دقیقاً لف یا لفت باشد)
+# ۳. پاسخ به لف یا لفت
 @bot.message_handler(func=lambda message: message.text and message.text.strip() in ['لف', 'لفت'])
 def send_left(message):
     bot.send_message(message.chat.id, "خیلی بدی کجا میری منو تنها میزاری؟ 💔", reply_to_message_id=message.message_id)
