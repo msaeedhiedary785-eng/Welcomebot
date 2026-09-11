@@ -33,22 +33,8 @@ def self_ping():
                 pass
             time.sleep(300)
 
-# تابع تشخیص سلام واقعی (جلوی جملاتی مثل «سلام کرد» را می‌گیرد)
-def check_real_greeting(text):
-    text = text.strip()
-    if text == 'سلام':
-        return True
-    if text.startswith('سلام'):
-        words = text.split()
-        # کلماتی که اگر بعد از سلام بیودند یعنی ربات نباید جواب بدهد
-        bad_words = ['کرد', 'داد', 'گفت', 'رسوند', 'فرستاد', 'اومد', 'کردند', 'دادند', 'کردی']
-        if len(words) > 1 and words[1] in bad_words:
-            return False
-        return True
-    return False
-
-# ۱. پاسخ به سلام واقعی
-@bot.message_handler(func=lambda message: message.text and check_real_greeting(message.text))
+# ۱. پاسخ به سلام (فقط وقتی پیام حداکثر ۲ یا ۳ کلمه باشد و با سلام شروع شود)
+@bot.message_handler(func=lambda message: message.text and message.text.strip().startswith('سلام') and len(message.text.split()) <= 3)
 def send_welcome(message):
     bot.send_message(message.chat.id, "سلام، خوبین ؟\nبه مشهد استار خوش اومدی 💫\nامیدوارم حال دلت خوب باشه 💞", reply_to_message_id=message.message_id)
 
